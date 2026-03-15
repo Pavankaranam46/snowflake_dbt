@@ -1,27 +1,28 @@
-
-/*
-    Welcome to your first dbt model!
-    Did you know that you can also configure models directly within SQL files?
-    This will override configurations stated in dbt_project.yml
-
-    Try changing "table" to "view" below
-*/
-
-{{ config(materialized='table') }}
-
+{{
+    config(
+        materialized='view',
+        query_tag = "DBT",
+        secure = true
+    )
+}}
 with source_data as (
 
     select 1 as id
     union all
     select null as id
 
+),
+
+filtered_data as (
+    select *
+    from source_data
+),
+
+transformed_data as (
+    select id, 
+           case when id is not null then 'Present' else 'NotPresent' end as id_status
+    from filtered_data
 )
 
 select *
-from source_data
-
-/*
-    Uncomment the line below to remove records with null `id` values
-*/
-
--- where id is not null
+from transformed_data
